@@ -90,9 +90,26 @@ export function useThreadStream({
     assistantId: "lead_agent",
     threadId: onStreamThreadId,
     reconnectOnMount: true,
-    fetchStateHistory: { limit: 1 },
+    // Always enable fetchStateHistory to support conversation continuity
+    // For new threads, 404 errors will be silently ignored in onError handler
+    fetchStateHistory: true,
     onCreated(meta) {
       handleStreamStart(meta.thread_id);
+    },
+    onError(error) {
+      // Ignore 404 errors - this can happen for:
+      // 1. New threads that don't have state history yet
+      // 2. Threads that were just created but haven't been persisted
+      if (
+        error &&
+        typeof error === "object" &&
+        "status" in error &&
+        (error as { status: number }).status === 404
+      ) {
+        return;
+      }
+      // Log other errors
+      console.error("Stream error:", error);
     },
     onLangChainEvent(event) {
       if (event.event === "on_tool_end") {

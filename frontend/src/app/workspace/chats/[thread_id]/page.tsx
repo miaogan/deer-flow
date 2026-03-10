@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { type PromptInputMessage } from "@/components/ai-elements/prompt-input";
 import { ArtifactTrigger } from "@/components/workspace/artifacts";
@@ -23,7 +23,16 @@ import { textOfMessage } from "@/core/threads/utils";
 import { env } from "@/env";
 import { cn } from "@/lib/utils";
 
-export default function ChatPage() {
+// Loading skeleton for SSR
+function ChatPageSkeleton() {
+  return (
+    <div className="flex size-full items-center justify-center">
+      <div className="animate-pulse text-muted-foreground">Loading...</div>
+    </div>
+  );
+}
+
+function ChatPageContent() {
   const { t } = useI18n();
   const [settings, setSettings] = useLocalSettings();
 
@@ -143,4 +152,20 @@ export default function ChatPage() {
       </ChatBox>
     </ThreadContext.Provider>
   );
+}
+
+// Export a component that only renders on the client to avoid hydration mismatch
+// This is needed because react-resizable-panels and radix-ui generate different IDs on server vs client
+export default function ChatPage() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <ChatPageSkeleton />;
+  }
+
+  return <ChatPageContent />;
 }

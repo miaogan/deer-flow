@@ -6,6 +6,7 @@
 #   - frontend: Frontend Next.js dev server (port 3000)
 #   - gateway: Backend Gateway API (port 8001)
 #   - langgraph: LangGraph server (port 2024)
+#   - postgres: PostgreSQL database for conversation persistence (port 5432)
 #   - provisioner (optional): Sandbox provisioner (creates Pods in host Kubernetes)
 #
 # Prerequisites:
@@ -14,6 +15,28 @@
 # Access: http://localhost:2026
 
 services:
+  # ── PostgreSQL Database ─────────────────────────────────────────────────
+  # Persist conversation state and thread data
+  postgres:
+    image: postgres:16-alpine
+    container_name: deer-flow-postgres
+    environment:
+      - POSTGRES_USER=deerflow
+      - POSTGRES_PASSWORD=deerflow123
+      - POSTGRES_DB=deerflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - deer-flow-pgdata:/var/lib/postgresql/data
+    networks:
+      - deer-flow-dev
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U deerflow -d deerflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # ── Sandbox Provisioner ────────────────────────────────────────────────
   # Manages per-sandbox Pod + Service lifecycle in the host Kubernetes
   # cluster via the K8s API.
@@ -157,7 +180,8 @@ services:
       - deer-flow-dev
     restart: unless-stopped
 
-volumes: {}
+volumes:
+  deer-flow-pgdata:
 
 networks:
   deer-flow-dev:
