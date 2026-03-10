@@ -24,6 +24,14 @@ class SandboxConfig(BaseModel):
         idle_timeout: Idle timeout in seconds before sandbox is released (default: 600 = 10 minutes). Set to 0 to disable.
         mounts: List of volume mounts to share directories with the container
         environment: Environment variables to inject into the container (values starting with $ are resolved from host env)
+
+    OpenSandboxProvider specific options:
+        image: Docker image to use (default: sandbox-registry.cn-zhangjiakou.cr.aliyuncs.com/opensandbox/code-interpreter)
+        entrypoint: Container entrypoint (default: ["/opt/opensandbox/code-interpreter.sh"])
+        workspace_host_path: Host path for persistent workspace storage
+        workspace_container_path: Container mount path (default: /workspace)
+        python_version: Python version in sandbox (default: "3.12")
+        environment: Environment variables to inject into the container
     """
 
     use: str = Field(
