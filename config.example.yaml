@@ -188,12 +188,28 @@ tools:
 # ============================================================================
 # Choose between local sandbox (direct execution) or Docker-based AIO sandbox
 
-# Option 1: Local Sandbox (Default)
-# Executes commands directly on the host machine
+# Option 1: OpenSandbox (Default)
+# Container-based sandbox using OpenSandbox SDK
 sandbox:
-  use: src.sandbox.local:LocalSandboxProvider
+  use: src.community.opensandbox:OpenSandboxProvider
+  # Optional: Container image (default: sandbox-registry.cn-zhangjiakou.cr.aliyuncs.com/opensandbox/code-interpreter)
+  # image: sandbox-registry.cn-zhangjiakou.cr.aliyuncs.com/opensandbox/code-interpreter
+  # Optional: Host path for persistent workspace (default: ./sandboxes)
+  # workspace_host_path: /path/on/host
+  # Optional: Container mount path for workspace (default: /workspace)
+  # workspace_container_path: /workspace
+  # Optional: Python version (default: "3.12")
+  # python_version: "3.12"
+  # Optional: Environment variables
+  # environment:
+  #   CUSTOM_VAR: value
 
-# Option 2: Container-based AIO Sandbox
+# Option 2: Local Sandbox
+# Executes commands directly on the host machine
+# sandbox:
+#   use: src.sandbox.local:LocalSandboxProvider
+
+# Option 3: Container-based AIO Sandbox
 # Executes commands in isolated containers (Docker or Apple Container)
 # On macOS: Automatically prefers Apple Container if available, falls back to Docker
 # On other platforms: Uses Docker
@@ -234,7 +250,7 @@ sandbox:
 #   #   API_KEY: $MY_API_KEY        # Reads from host's MY_API_KEY env var
 #   #   DATABASE_URL: $DATABASE_URL  # Reads from host's DATABASE_URL env var
 
-# Option 3: Provisioner-managed AIO Sandbox (docker-compose-dev)
+# Option 4: Provisioner-managed AIO Sandbox (docker-compose-dev)
 # Each sandbox_id gets a dedicated Pod in k3s, managed by the provisioner.
 # Recommended for production or advanced users who want better isolation and scalability.:
 # sandbox:
